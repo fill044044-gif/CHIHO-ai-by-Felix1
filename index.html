@@ -1,0 +1,939 @@
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHIHO GAME SYSTEM — QR → Игра → Предсказание → Апселл → Возврат</title>
+  <meta name="description" content="Готовый рабочий сайт-прототип для механики QR-игры, предсказания настроения, апселла и возврата гостей." />
+  <style>
+    :root{
+      --bg:#070707;
+      --bg-2:#0c0c0c;
+      --card:#121212;
+      --card-2:#171717;
+      --line:rgba(255,255,255,.08);
+      --text:#f4f4f4;
+      --muted:#b1b1b1;
+      --red:#ff453a;
+      --red-2:#ff6b61;
+      --gold:#ffc857;
+      --mint:#63ffd8;
+      --ok:#34d399;
+      --shadow:0 24px 80px rgba(0,0,0,.45);
+      --radius:28px;
+      --radius-sm:18px;
+      --max:1240px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;color:var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 15% -10%, rgba(255,69,58,.16), transparent 45%),
+        radial-gradient(900px 700px at 100% 0%, rgba(255,200,87,.10), transparent 40%),
+        linear-gradient(180deg,#050505 0%, #0a0a0a 50%, #060606 100%);
+      min-height:100%;
+      scroll-behavior:smooth;
+    }
+    a{text-decoration:none;color:inherit}
+    img{max-width:100%}
+    .wrap{max-width:var(--max);margin:0 auto;padding:24px}
+    .nav{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter: blur(12px);
+      background:linear-gradient(180deg,rgba(7,7,7,.82),rgba(7,7,7,.54));
+      border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    .nav-inner{
+      max-width:var(--max);margin:0 auto;padding:14px 24px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;
+    }
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{
+      width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+      font-weight:900;letter-spacing:.02em;
+      background:linear-gradient(135deg,var(--red),#7d1111);
+      box-shadow:0 0 0 1px rgba(255,255,255,.05) inset, 0 16px 38px rgba(255,69,58,.24);
+    }
+    .brand h1{margin:0;font-size:16px;line-height:1.05}
+    .brand p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .nav-links a,.btn{
+      padding:12px 16px;border-radius:999px;font-weight:700;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      transition:.18s transform,.18s opacity,.18s background,.18s box-shadow;
+      cursor:pointer;
+    }
+    .nav-links a:hover,.btn:hover{transform:translateY(-1px)}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--red),var(--red-2));
+      border-color:transparent;
+      box-shadow:0 12px 28px rgba(255,69,58,.22);
+    }
+    .btn-dark{background:#111}
+    .hero{
+      padding:48px 0 26px;
+      display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:stretch;
+    }
+    .kicker{
+      display:inline-flex;padding:10px 14px;border-radius:999px;
+      background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.2);
+      color:#ffd9d7;font-size:13px;font-weight:700;margin-bottom:18px;
+    }
+    .title{
+      font-size:clamp(36px,6vw,74px);line-height:.93;letter-spacing:-.045em;
+      margin:0 0 16px;font-weight:950;
+    }
+    .lead{color:var(--muted);font-size:18px;line-height:1.62;max-width:58ch;margin:0 0 22px}
+    .tags{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px}
+    .tag{
+      padding:10px 14px;border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      font-size:13px;color:#e8e8e8
+    }
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      position:relative;overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;left:-20%;right:-20%;top:-140px;height:220px;
+      background:radial-gradient(circle at center, rgba(255,69,58,.16), transparent 55%);
+      pointer-events:none;
+    }
+    .hero-panel{padding:22px}
+    .phone{
+      border-radius:34px;background:linear-gradient(180deg,#111,#090909);
+      border:1px solid rgba(255,255,255,.08);padding:14px;min-height:660px;
+      box-shadow:var(--shadow);
+    }
+    .notch{width:150px;height:24px;background:#020202;border-radius:999px;margin:0 auto 14px}
+    .screen{
+      min-height:590px;border-radius:28px;padding:16px;
+      background:
+        radial-gradient(900px 540px at 50% -16%, rgba(255,69,58,.15), transparent 40%),
+        linear-gradient(180deg,#0b0b0b,#0d0d0d);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .screen-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .screen-top b{font-size:15px}
+    .screen-top span{font-size:12px;color:var(--muted)}
+    .section{padding:22px 0}
+    .section-title{
+      font-size:clamp(24px,3vw,40px);letter-spacing:-.03em;margin:0 0 10px;
+    }
+    .section-sub{margin:0;color:var(--muted);font-size:16px;line-height:1.58;max-width:72ch}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .panel{padding:22px}
+    .stat b{display:block;font-size:28px;margin-bottom:6px}
+    .stat span{color:var(--muted);font-size:14px;line-height:1.5}
+    .bullet{
+      display:flex;gap:12px;align-items:flex-start;margin:12px 0;
+      color:#ececec;line-height:1.55
+    }
+    .bullet .dot{
+      width:11px;height:11px;border-radius:50%;margin-top:8px;
+      background:linear-gradient(135deg,var(--red),var(--gold));
+      flex:0 0 auto;
+      box-shadow:0 0 14px rgba(255,69,58,.32);
+    }
+
+    /* Demo */
+    .demo-grid{display:grid;grid-template-columns:1fr .94fr;gap:22px}
+    .wheel-area{padding:24px}
+    .wheel-wrap{display:grid;place-items:center;padding:14px 0 10px}
+    .wheel-box{position:relative;width:min(92vw,380px);aspect-ratio:1}
+    .pointer{
+      position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+      width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid var(--gold);
+      z-index:4;filter:drop-shadow(0 10px 20px rgba(255,200,87,.3));
+    }
+    .wheel{
+      width:100%;height:100%;border-radius:50%;
+      background:conic-gradient(
+        #ff453a 0 72deg,
+        #ffc857 72deg 144deg,
+        #ff7168 144deg 216deg,
+        #f09d51 216deg 288deg,
+        #ff8d42 288deg 360deg
+      );
+      border:12px solid #111;
+      position:relative;
+      transition:transform 4.2s cubic-bezier(.11,.88,.16,1);
+      box-shadow:0 20px 48px rgba(0,0,0,.48), inset 0 0 0 10px rgba(255,255,255,.04);
+    }
+    .wheel::after{
+      content:"";position:absolute;inset:26%;border-radius:50%;
+      background:linear-gradient(180deg,#161616,#0e0e0e);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .center-btn{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:92px;height:92px;border-radius:50%;z-index:6;
+      display:grid;place-items:center;
+      font-weight:900;letter-spacing:.03em;
+      background:linear-gradient(135deg,var(--red),#861111);
+      border:3px solid rgba(255,255,255,.08);
+      box-shadow:0 14px 26px rgba(255,69,58,.24);
+      cursor:pointer; user-select:none;
+    }
+    .seg-label span{
+      position:absolute;left:50%;top:12px;transform-origin:0 172px;
+      font-size:12px;font-weight:800;border-radius:999px;padding:4px 8px;
+      background:rgba(255,255,255,.62);color:#111;white-space:nowrap;
+    }
+    .result-box,.quiz-box,.predict-box{
+      margin-top:16px;padding:18px;border-radius:20px;
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)
+    }
+    .result-box strong,.predict-box strong{display:block;font-size:22px;margin-bottom:8px}
+    .muted{color:var(--muted)}
+    .code{
+      display:inline-block;margin-top:12px;padding:10px 12px;border-radius:12px;
+      background:#111;border:1px dashed rgba(255,255,255,.18);
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .result-actions,.hero-actions,.cta-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .progress{height:10px;background:#131313;border-radius:999px;overflow:hidden;margin:6px 0 14px}
+    .progress > div{
+      height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .2s ease
+    }
+    .question{font-size:22px;font-weight:900;letter-spacing:-.02em;margin:6px 0 12px}
+    .answers{display:grid;gap:10px}
+    .answer{
+      padding:14px 14px;border-radius:16px;background:#151515;border:1px solid rgba(255,255,255,.06);
+      font-weight:700;cursor:pointer;text-align:left;transition:.18s background,.18s transform
+    }
+    .answer:hover{background:#191919;transform:translateY(-1px)}
+    .answer small{display:block;color:var(--muted);font-weight:500;margin-top:4px}
+    .recommend{
+      display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center;margin-top:12px
+    }
+    .art{
+      width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#101010;border:1px solid rgba(255,255,255,.06)
+    }
+    .flow{
+      display:grid;grid-template-columns:repeat(5,1fr);gap:14px
+    }
+    .flow-step{padding:18px;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .flow-step b{display:block;margin-bottom:8px;font-size:18px}
+    .flow-step p{margin:0;color:var(--muted);line-height:1.52}
+    .scenario{padding:18px;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .scenario b{display:block;margin-bottom:8px;font-size:18px}
+    .scenario p{margin:0;color:var(--muted);line-height:1.55}
+    .cta{
+      padding:28px;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center
+    }
+    .cta h3{font-size:clamp(28px,4vw,44px);line-height:.96;margin:0 0 10px;letter-spacing:-.03em}
+    .cta p{margin:0;color:var(--muted);line-height:1.6;font-size:16px}
+    .footer{
+      color:var(--muted);font-size:13px;text-align:center;padding:18px 0 26px
+    }
+
+    .hidden{display:none!important}
+    @media (max-width: 1080px){
+      .hero,.demo-grid,.cta,.grid-2,.flow{grid-template-columns:1fr}
+    }
+    @media (max-width: 920px){
+      .grid-3{grid-template-columns:1fr}
+      .grid-4{grid-template-columns:repeat(2,1fr)}
+      .nav-inner{flex-direction:column;align-items:flex-start}
+      .nav-links{width:100%}
+    }
+    @media (max-width: 720px){
+      .wrap{padding:16px}
+      .nav-inner{padding:12px 16px}
+      .grid-4{grid-template-columns:1fr}
+      .recommend{grid-template-columns:1fr}
+      .hero{padding-top:28px}
+      .phone{min-height:auto}
+      .screen{min-height:auto}
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo">CH</div>
+        <div>
+          <h1>CHIHO GAME SYSTEM</h1>
+          <p>QR → игра → предсказание → апселл → возврат</p>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="#logic">Логика</a>
+        <a href="#demo">Демо</a>
+        <a href="#scenarios">Сценарии</a>
+        <a href="#economics">Экономика</a>
+        <button class="btn" id="soundToggle">🔊 Звук: ON</button>
+        <a href="#launch" class="btn btn-primary">Запустить тест</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="card hero-panel">
+        <div class="kicker">Маркетингово-сбалансированный продуктовый сайт</div>
+        <h2 class="title">Не акция.<br>Система возврата гостей через эмоцию, игру и допродажу.</h2>
+        <p class="lead">
+          С точки зрения маркетинга самая сильная часть этой механики — она не продаёт скидку в лоб.
+          Она ведёт гостя по воронке: <b>интерес → участие → персонализация → рекомендация → покупка → возврат</b>.
+          Поэтому ниже сайт собран как полноценный продукт, а не как отдельная игра.
+        </p>
+        <div class="tags">
+          <span class="tag">Живое колесо</span>
+          <span class="tag">4 касания</span>
+          <span class="tag">3 сценария выдачи</span>
+          <span class="tag">5 баз результатов</span>
+          <span class="tag">Апселл после эмоции</span>
+          <span class="tag">Telegram-ready логика</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn-primary">Открыть живое демо</a>
+          <a href="#logic" class="btn btn-dark">Смотреть механику</a>
+        </div>
+
+        <div class="grid-4" style="margin-top:24px">
+          <div class="card panel stat"><b>+эмоция</b><span>Игра создаёт микропобеду до предложения товара.</span></div>
+          <div class="card panel stat"><b>+апселл</b><span>Квиз переводит эмоцию в конкретную рекомендацию.</span></div>
+          <div class="card panel stat"><b>+возврат</b><span>Промокод и награда дают повод прийти снова.</span></div>
+          <div class="card panel stat"><b>+сарафанка</b><span>Формат “предсказания” хочется показать друзьям.</span></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="screen-top"><b>Preview</b><span>mobile-first landing</span></div>
+          <div class="art" style="aspect-ratio:16/11;border-radius:22px">
+            <svg viewBox="0 0 720 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#291210"/>
+                  <stop offset="100%" stop-color="#0d0d0d"/>
+                </linearGradient>
+                <radialGradient id="glow1" cx="50%" cy="25%" r="70%">
+                  <stop offset="0%" stop-color="#ff6b61" stop-opacity=".35"/>
+                  <stop offset="100%" stop-color="#ff6b61" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="720" height="500" rx="40" fill="url(#bg1)"/>
+              <rect width="720" height="500" fill="url(#glow1)"/>
+              <ellipse cx="360" cy="352" rx="210" ry="58" fill="#101010"/>
+              <ellipse cx="360" cy="312" rx="230" ry="108" fill="#171717" stroke="#343434" stroke-width="7"/>
+              <ellipse cx="360" cy="302" rx="186" ry="78" fill="#2a140f"/>
+              <path d="M250 286c40-64 172-76 246 4 28 30 22 72-22 100-56 36-185 24-239-20-37-29-29-58 15-84Z" fill="#ef9941"/>
+              <path d="M246 300c72 48 118 54 180 30" stroke="#ffe19e" stroke-width="12" stroke-linecap="round"/>
+              <path d="M284 256c68 42 104 56 162 80" stroke="#d74a34" stroke-width="17" stroke-linecap="round"/>
+              <g opacity=".76" stroke="#fff" stroke-linecap="round">
+                <path d="M278 196c-10-24-8-46 7-64"/>
+                <path d="M348 176c-8-20-3-44 16-63"/>
+                <path d="M430 188c-9-22-1-46 20-65"/>
+              </g>
+              <text x="44" y="66" fill="#f7f7f7" font-size="34" font-weight="900">QR → GAME → QUIZ → RETURN</text>
+              <text x="44" y="104" fill="#c1c1c1" font-size="22">Гость не просто покупает. Он вовлекается и возвращается.</text>
+            </svg>
+          </div>
+          <div class="tags" style="margin-top:14px">
+            <span class="tag">брендовый вайб</span>
+            <span class="tag">неон + street food</span>
+            <span class="tag">1 мысль на экран</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="logic" class="section">
+      <h2 class="section-title">Почему эта механика маркетингово сильнее обычной скидки</h2>
+      <p class="section-sub">
+        Сбалансированная модель здесь строится на трёх уровнях: эмоция, персонализация, управляемая экономика.
+        Это позволяет не обесценивать продукт постоянной скидкой и при этом давать гостю ощущение выигрыша.
+      </p>
+
+      <div class="grid-3" style="margin-top:18px">
+        <div class="card panel">
+          <h3 style="margin:0 0 12px;font-size:24px">1. Эмоция до оффера</h3>
+          <div class="bullet"><span class="dot"></span><span>Сначала гость вовлекается в игру и получает микродофамин.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Предложение товара показывается уже после ощущения выигрыша.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Из-за этого оффер воспринимается мягче и продаёт лучше.</span></div>
+        </div>
+        <div class="card panel">
+          <h3 style="margin:0 0 12px;font-size:24px">2. Персонализация вместо хаоса</h3>
+          <div class="bullet"><span class="dot"></span><span>4 вопроса сегментируют настроение и тип мотивации гостя.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Результат выглядит персональным, а не случайным баннером.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Так апселл становится похож на совет, а не на продавливание.</span></div>
+        </div>
+        <div class="card panel">
+          <h3 style="margin:0 0 12px;font-size:24px">3. Экономика под контролем</h3>
+          <div class="bullet"><span class="dot"></span><span>Вероятности призов управляются внутри колеса.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Результат квиза не раздаёт дорогие подарки всем подряд.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Главный рост чека создаётся через комбо, напитки, десерты и апгрейды.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card panel">
+        <h2 class="section-title" style="margin-bottom:18px">Полный путь гостя</h2>
+        <div class="flow">
+          <div class="flow-step"><b>1. QR</b><p>Сканирует код на кассе, упаковке или столе.</p></div>
+          <div class="flow-step"><b>2. Игра</b><p>Крутит колесо и получает мгновенную эмоцию выигрыша.</p></div>
+          <div class="flow-step"><b>3. Квиз</b><p>Проходит 4 быстрых вопроса без регистрации и лишних шагов.</p></div>
+          <div class="flow-step"><b>4. Апселл</b><p>Получает одно понятное персональное предложение.</p></div>
+          <div class="flow-step"><b>5. Возврат</b><p>Показывает код на кассе сейчас или возвращается позже.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="section">
+      <h2 class="section-title">Живое демо механики</h2>
+      <p class="section-sub">
+        Ниже рабочий интерактивный блок сайта: колесо, промокод, 4-тап квиз, 3 сценария интерпретации и 5 баз результатов.
+      </p>
+
+      <div class="demo-grid" style="margin-top:18px">
+        <div class="card wheel-area">
+          <h3 style="margin:0 0 6px;font-size:28px">Колесо призов</h3>
+          <p class="section-sub" style="font-size:15px">Цель блока — быстро дать гостю эмоцию и подготовить его к следующему шагу.</p>
+          <div class="wheel-wrap">
+            <div class="wheel-box">
+              <div class="pointer"></div>
+              <div id="wheel" class="wheel">
+                <div class="seg-label">
+                  <span style="transform:rotate(0deg)">Соус</span>
+                  <span style="transform:rotate(72deg)">Десерт</span>
+                  <span style="transform:rotate(144deg)">-10%</span>
+                  <span style="transform:rotate(216deg)">Напиток</span>
+                  <span style="transform:rotate(288deg)">Комбо</span>
+                </div>
+              </div>
+              <div id="spinBtn" class="center-btn">SPIN</div>
+            </div>
+          </div>
+          <div id="spinResult" class="result-box hidden"></div>
+        </div>
+
+        <div class="card panel">
+          <h3 style="margin:0 0 6px;font-size:28px">Квиз-предсказание</h3>
+          <p class="section-sub" style="font-size:15px">После игры гость проходит 4 вопроса. На выходе получает только один результат — самый релевантный.</p>
+
+          <div id="quizStart" class="quiz-box">
+            <div style="font-size:22px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px">Сначала крути колесо, затем узнаем твой вайб</div>
+            <div class="muted">Это правильная последовательность для UX: сначала эмоция, потом персонализация, затем покупка.</div>
+          </div>
+
+          <div id="quizBox" class="quiz-box hidden">
+            <div class="progress"><div id="progressBar"></div></div>
+            <div id="quizQuestion" class="question"></div>
+            <div id="quizAnswers" class="answers"></div>
+          </div>
+
+          <div id="predictBox" class="predict-box hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenarios" class="section">
+      <h2 class="section-title">3 сценария выдачи результата</h2>
+      <p class="section-sub">Их можно тестировать по отдельности на разных точках, аудиториях или временных интервалах.</p>
+      <div class="grid-3" style="margin-top:18px">
+        <div class="scenario">
+          <b>Сценарий A — “Твоё настроение сейчас”</b>
+          <p>Подходит для быстрого эмоционального апселла. Результат связан с текущим желанием: острое, сытное, сладкое, буст, бонус.</p>
+        </div>
+        <div class="scenario">
+          <b>Сценарий B — “Какой ты герой сегодня”</b>
+          <p>Делает механику более сторисной и запоминаемой. Лучше работает на брендовый вайб и вовлечение.</p>
+        </div>
+        <div class="scenario">
+          <b>Сценарий C — “Что тебе нужно прямо сейчас”</b>
+          <p>Самый рациональный сценарий. Больше подходит для прямого перевода в покупку без лишней поэзии.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="economics" class="section">
+      <div class="grid-2">
+        <div class="card panel">
+          <h2 class="section-title">Как это зарабатывает деньги</h2>
+          <div class="bullet"><span class="dot"></span><span>Не только через приз, а через рост вероятности второго действия: комбо, напиток, десерт, апгрейд.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Промокод усиливает чувство ценности даже у недорогого подарка.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Квиз снижает хаос выбора и переводит гостя к одной понятной позиции.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Самая безопасная база для теста — апселл на высокомаржинальные категории.</span></div>
+        </div>
+        <div class="card panel">
+          <h2 class="section-title">Что важно тестировать</h2>
+          <div class="bullet"><span class="dot"></span><span>Процент сканирования QR от потока.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Доля гостей, которые докручивают механику до результата.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Конверсия результата в допокупку.</span></div>
+          <div class="bullet"><span class="dot"></span><span>Какие сценарии и выдачи дают лучший прирост среднего чека.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="launch" class="section">
+      <div class="card cta">
+        <div>
+          <h3>Сайт уже собран как рабочий тестовый продукт.</h3>
+          <p>
+            Его можно загрузить на обычный HTTPS-хостинг, открыть по QR, проверить на точке и дальше развивать в Telegram Mini App или кассовую интеграцию.
+            Для теста всё нужное уже внутри: логика, звук, визуалы, результаты и триггеры на покупку.
+          </p>
+          <div class="cta-actions" style="margin-top:18px">
+            <button class="btn btn-primary" onclick="resetDemo()">Перезапустить демо</button>
+            <button class="btn btn-dark" onclick="scrollToDemo()">Протестировать сейчас</button>
+          </div>
+        </div>
+        <div class="card panel" style="border-radius:24px">
+          <div style="font-size:22px;font-weight:900;margin-bottom:8px">Базовый план запуска</div>
+          <div class="bullet"><span class="dot"></span><span>1. Поставить QR на кассе, чеке и упаковке.</span></div>
+          <div class="bullet"><span class="dot"></span><span>2. Запустить 1–2 недели как маркетинговый тест.</span></div>
+          <div class="bullet"><span class="dot"></span><span>3. Отслеживать, какие выдачи дают лучший апселл.</span></div>
+          <div class="bullet"><span class="dot"></span><span>4. Затем переносить в Telegram Mini App или CRM-логику.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Тестовый сайт-прототип. Для прод-версии отдельно стоит добавить серверную валидацию кодов, аналитику и базу пользователей.
+    </div>
+  </main>
+
+  <script>
+    const state = {
+      soundOn: true,
+      audioUnlocked: false,
+      prize: null,
+      promoCode: null,
+      quizIndex: 0,
+      answers: [],
+      scenario: null,
+      resultBase: null
+    };
+
+    const prizes = [
+      { id:"sauce", label:"Соус в подарок", angle:36, weight:35, bonus:"Бери любой вок и получай соус как мягкий старт к допокупке." },
+      { id:"dessert", label:"Мини-десерт", angle:108, weight:22, bonus:"Хороший триггер на догоняющий чек без сильной нагрузки на экономику." },
+      { id:"discount", label:"Скидка 10%", angle:180, weight:18, bonus:"Работает как усилитель решения, когда нужно подтолкнуть без сильного дисконта." },
+      { id:"drink", label:"Напиток за полцены", angle:252, weight:15, bonus:"Сильный вариант для высокой маржи и быстрого апселла." },
+      { id:"combo", label:"Апгрейд до комбо", angle:324, weight:10, bonus:"Лучший триггер на рост среднего чека внутри текущего визита." }
+    ];
+
+    const questions = [
+      {
+        title:"С какого вайба начинается твой заказ?",
+        answers:[
+          {text:"🔥 Хочу ярко и остро", score:{spicy:3, rebel:2, boost:1}},
+          {text:"😌 Хочу спокойно и вкусно", score:{comfort:3, calm:2}},
+          {text:"⚡ Нужен быстрый заряд", score:{boost:3, ninja:2}}
+        ]
+      },
+      {
+        title:"Какой формат тебе ближе прямо сейчас?",
+        answers:[
+          {text:"🍜 Сытно и плотно", score:{hunger:3, comfort:1}},
+          {text:"🥡 Быстро и удобно", score:{boost:2, ninja:1}},
+          {text:"🍰 Хочу порадовать себя", score:{sweet:3, reward:2}}
+        ]
+      },
+      {
+        title:"Какой у тебя темп сегодня?",
+        answers:[
+          {text:"🎯 Очень быстрый", score:{boost:3, ninja:2}},
+          {text:"😎 Есть время кайфануть", score:{reward:2, aesthete:2}},
+          {text:"🤝 Я здесь за атмосферой", score:{calm:2, comfort:2}}
+        ]
+      },
+      {
+        title:"Что тебе приятнее как финальный штрих?",
+        answers:[
+          {text:"🌶 Новый яркий вкус", score:{spicy:2, rebel:2}},
+          {text:"🥢 Надёжный любимый вариант", score:{comfort:2, hunger:1}},
+          {text:"🎁 Маленький бонус к заказу", score:{reward:3, sweet:1}}
+        ]
+      }
+    ];
+
+    const resultBases = [
+      {
+        id:"spicyWok",
+        titleA:"Тебе нужен вок с остринкой",
+        titleB:"Сегодня ты — бунтарь вкуса",
+        titleC:"Тебе нужен яркий новый вкус",
+        product:"Острый вок + напиток",
+        cta:"Это лучший апселл для эмоционального выбора: горячее блюдо плюс напиток.",
+        art:"spicy"
+      },
+      {
+        id:"comboFast",
+        titleA:"Тебе нужно сытно и быстро",
+        titleB:"Сегодня ты — ниндзя городского ритма",
+        titleC:"Тебе нужен быстрый и удобный буст",
+        product:"Комбо: вок + напиток",
+        cta:"Самый понятный вариант для роста чека без перегруза гостя выбором.",
+        art:"combo"
+      },
+      {
+        id:"dessertMood",
+        titleA:"Ты сегодня про наслаждение",
+        titleB:"Сегодня ты — эстет настроения",
+        titleC:"Тебе нужна маленькая награда",
+        product:"Десерт + bubble tea / чай",
+        cta:"Идеальный мягкий догоняющий апселл после основного блюда.",
+        art:"dessert"
+      },
+      {
+        id:"energyDrink",
+        titleA:"Тебе нужен буст",
+        titleB:"Сегодня ты — охотник за зарядом",
+        titleC:"Тебе нужен быстрый заряд энергии",
+        product:"Напиток / кофе / bubble tea",
+        cta:"Быстрое решение для тех, кто не хочет долго думать перед кассой.",
+        art:"drink"
+      },
+      {
+        id:"bonusOrder",
+        titleA:"Ты заслужил бонус к заказу",
+        titleB:"Сегодня ты — кайфолог с призом",
+        titleC:"Тебе нужен повод взять чуть больше",
+        product:"Любое блюдо + бонус",
+        cta:"Работает как триггер на дополнительную позицию через ощущение выгодного добора.",
+        art:"bonus"
+      }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function weightedPick(items){
+      const total = items.reduce((s,i)=>s+i.weight,0);
+      let r = Math.random()*total;
+      for(const item of items){
+        r -= item.weight;
+        if(r <= 0) return item;
+      }
+      return items[items.length-1];
+    }
+    function promoCode(prefix='CHIHO'){
+      return `${prefix}-${Math.floor(1000 + Math.random()*9000)}`;
+    }
+
+    let audioCtx = null;
+    function initAudio(){
+      if(state.audioUnlocked) return;
+      try{
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        state.audioUnlocked = true;
+      }catch(e){
+        state.soundOn = false;
+        updateSoundBtn();
+      }
+    }
+    function beep({freq=440,duration=.08,type='sine',gain=.03,attack=.005,release=.05,slideTo=null}={}){
+      if(!state.soundOn || !state.audioUnlocked || !audioCtx) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, audioCtx.currentTime + duration);
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(gain, audioCtx.currentTime + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration + release);
+      o.connect(g).connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + duration + release + .02);
+    }
+    function playClick(){ beep({freq:700,duration:.03,type:'square',gain:.018,release:.03,slideTo:530}); }
+    function playTick(){ beep({freq:500 + Math.random()*70,duration:.02,type:'triangle',gain:.012,release:.02,slideTo:430}); }
+    function playWin(){
+      beep({freq:660,duration:.06,type:'triangle',gain:.03,release:.05,slideTo:760});
+      setTimeout(()=>beep({freq:880,duration:.07,type:'triangle',gain:.028,release:.06,slideTo:1100}),90);
+      setTimeout(()=>beep({freq:1320,duration:.08,type:'sine',gain:.02,release:.09,slideTo:1540}),180);
+    }
+    function updateSoundBtn(){
+      $('soundToggle').textContent = state.soundOn ? '🔊 Звук: ON' : '🔇 Звук: OFF';
+    }
+
+    let currentRotation = 0;
+    let spinning = false;
+    function spinWheel(){
+      if(spinning) return;
+      initAudio();
+      playClick();
+      state.prize = weightedPick(prizes);
+      state.promoCode = promoCode();
+      spinning = true;
+
+      const fullTurns = 6 + Math.floor(Math.random()*3);
+      const target = 360 - state.prize.angle;
+      currentRotation += fullTurns * 360 + target + Math.random()*8 - 4;
+      $('wheel').style.transform = `rotate(${currentRotation}deg)`;
+
+      let ticks = 0;
+      const int = setInterval(()=>{
+        playTick();
+        ticks++;
+        if(ticks > 26) clearInterval(int);
+      },120);
+
+      setTimeout(()=>{
+        clearInterval(int);
+        playWin();
+        spinning = false;
+        renderSpinResult();
+      },4300);
+    }
+
+    function renderSpinResult(){
+      $('spinResult').classList.remove('hidden');
+      $('spinResult').innerHTML = `
+        <strong>🎉 ${escapeHtml(state.prize.label)}</strong>
+        <div class="muted">${escapeHtml(state.prize.bonus)}</div>
+        <div class="code">Код: ${escapeHtml(state.promoCode)} · действует 24 часа</div>
+        <div class="result-actions" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="startQuiz()">Пройти предсказание</button>
+          <button class="btn btn-dark" onclick="resetDemo()">Сбросить</button>
+        </div>
+      `;
+    }
+
+    function startQuiz(){
+      initAudio();
+      playClick();
+      state.quizIndex = 0;
+      state.answers = [];
+      $('quizStart').classList.add('hidden');
+      $('predictBox').classList.add('hidden');
+      $('quizBox').classList.remove('hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion(){
+      const q = questions[state.quizIndex];
+      $('progressBar').style.width = `${(state.quizIndex / questions.length) * 100}%`;
+      $('quizQuestion').textContent = q.title;
+      $('quizAnswers').innerHTML = q.answers.map((a,idx)=>`
+        <div class="answer" onclick="answerQuestion(${idx})">
+          ${escapeHtml(a.text)}
+          <small>1 касание · быстрый ответ</small>
+        </div>
+      `).join('');
+    }
+
+    function answerQuestion(idx){
+      playClick();
+      state.answers.push(questions[state.quizIndex].answers[idx].score);
+      state.quizIndex++;
+      if(state.quizIndex < questions.length){
+        renderQuestion();
+      }else{
+        $('progressBar').style.width = '100%';
+        evaluateQuiz();
+      }
+    }
+
+    function evaluateQuiz(){
+      const totals = {};
+      for(const part of state.answers){
+        for(const [k,v] of Object.entries(part)){
+          totals[k] = (totals[k] || 0) + v;
+        }
+      }
+
+      if((totals.rebel || 0) + (totals.aesthete || 0) + (totals.ninja || 0) >= 4){
+        state.scenario = 'B';
+      } else if((totals.boost || 0) + (totals.comfort || 0) + (totals.reward || 0) >= 5){
+        state.scenario = 'C';
+      } else {
+        state.scenario = 'A';
+      }
+
+      const scores = {
+        spicyWok: (totals.spicy || 0) + (totals.rebel || 0),
+        comboFast: (totals.hunger || 0) + (totals.ninja || 0) + (totals.comfort || 0),
+        dessertMood: (totals.sweet || 0) + (totals.aesthete || 0) + (totals.reward || 0),
+        energyDrink: (totals.boost || 0),
+        bonusOrder: (totals.reward || 0) + (state.prize?.id === 'discount' ? 1 : 0) + (state.prize?.id === 'combo' ? 2 : 0)
+      };
+
+      let best = 'comboFast', bestScore = -Infinity;
+      for(const [id,score] of Object.entries(scores)){
+        if(score > bestScore){
+          bestScore = score;
+          best = id;
+        }
+      }
+      state.resultBase = resultBases.find(r => r.id === best) || resultBases[1];
+      renderPrediction();
+    }
+
+    function getScenarioTitle(base){
+      if(state.scenario === 'A') return base.titleA;
+      if(state.scenario === 'B') return base.titleB;
+      return base.titleC;
+    }
+
+    function renderPrediction(){
+      $('quizBox').classList.add('hidden');
+      $('predictBox').classList.remove('hidden');
+
+      const base = state.resultBase;
+      const scenario = state.scenario === 'A'
+        ? 'Сценарий A — настроение'
+        : state.scenario === 'B'
+          ? 'Сценарий B — герой дня'
+          : 'Сценарий C — потребность момента';
+
+      $('predictBox').innerHTML = `
+        <strong>🔮 ${escapeHtml(getScenarioTitle(base))}</strong>
+        <div class="muted">${escapeHtml(scenario)}</div>
+        <div class="recommend">
+          <div class="art">${dishSvg(base.art)}</div>
+          <div>
+            <div style="font-size:20px;font-weight:900;margin-bottom:8px">${escapeHtml(base.product)}</div>
+            <div class="muted" style="line-height:1.58">${escapeHtml(base.cta)}</div>
+            <div class="tags" style="margin-top:14px">
+              <span class="tag">Промокод: ${escapeHtml(state.promoCode)}</span>
+              <span class="tag">Выигрыш: ${escapeHtml(state.prize.label)}</span>
+            </div>
+            <div class="result-actions">
+              <button class="btn btn-primary" onclick="mockOrder()">Добавить к заказу</button>
+              <button class="btn btn-dark" onclick="resetDemo()">Начать заново</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function mockOrder(){
+      playWin();
+      alert('Тестовый заказ добавлен.\n\nВ прод-версии тут можно сделать переход в Telegram Mini App, отправку кода кассиру или интеграцию с CRM/кассой.');
+    }
+
+    function dishSvg(type){
+      const start = `
+      <svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ff6b61" stop-opacity=".25"/>
+            <stop offset="100%" stop-color="#ff6b61" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#23100f"/><stop offset="100%" stop-color="#0f0f0f"/>
+          </linearGradient>
+        </defs>
+        <rect width="360" height="360" rx="28" fill="url(#bg)"/>
+        <rect width="360" height="360" fill="url(#g1)"/>
+      `;
+      const bowl = `
+        <ellipse cx="180" cy="262" rx="102" ry="30" fill="#0e0e0e"/>
+        <ellipse cx="180" cy="228" rx="114" ry="56" fill="#161616" stroke="#353535" stroke-width="5"/>
+        <ellipse cx="180" cy="222" rx="92" ry="38" fill="#28140f"/>
+      `;
+      const steam = `
+        <g opacity=".72" stroke="#f8f8f8" stroke-linecap="round">
+          <path d="M132 126c-7-16-6-32 5-47"/>
+          <path d="M180 114c-6-14-2-29 10-42"/>
+          <path d="M226 124c-7-17-2-33 12-47"/>
+        </g>
+      `;
+      const end = `</svg>`;
+      if(type === 'spicy'){
+        return start + bowl + `
+          <path d="M104 217c22-36 84-48 151 1 19 14 25 37 12 53-22 28-106 34-150 7-29-17-35-40-13-61Z" fill="#f0842d"/>
+          <path d="M114 224c58 38 102 42 134 20" stroke="#ffd98f" stroke-width="8" stroke-linecap="round"/>
+          <path d="M132 193c34 26 57 34 97 51" stroke="#d63d2f" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="238" cy="206" r="8" fill="#d63d2f"/>
+          <circle cx="154" cy="232" r="7" fill="#7ecf5a"/>
+          ${steam}
+        ` + end;
+      }
+      if(type === 'combo'){
+        return start + bowl + `
+          <path d="M100 214c34-32 126-39 156 8 17 26-8 49-50 57-63 12-131-18-128-50 1-5 5-10 22-15Z" fill="#de8f41"/>
+          <path d="M105 210c31 21 124 23 149 9" stroke="#ffe09a" stroke-width="9" stroke-linecap="round"/>
+          <rect x="244" y="110" width="54" height="90" rx="10" fill="#ffcc66"/>
+          <rect x="258" y="89" width="28" height="24" rx="6" fill="#fff5dd"/>
+          ${steam}
+        ` + end;
+      }
+      if(type === 'dessert'){
+        return start + `
+          <ellipse cx="180" cy="276" rx="112" ry="28" fill="#0f0f0f"/>
+          <rect x="122" y="104" width="116" height="138" rx="24" fill="#ffe3c0"/>
+          <rect x="134" y="126" width="92" height="100" rx="18" fill="#ffc1c1"/>
+          <circle cx="180" cy="96" r="24" fill="#fff7f0"/>
+          <circle cx="180" cy="92" r="8" fill="#ff8f8f"/>
+          <circle cx="147" cy="144" r="7" fill="#ffd25f"/>
+          <circle cx="210" cy="160" r="7" fill="#b6f56d"/>
+          <circle cx="182" cy="184" r="7" fill="#8ce7ff"/>
+        ` + end;
+      }
+      if(type === 'drink'){
+        return start + `
+          <ellipse cx="180" cy="285" rx="92" ry="24" fill="#101010"/>
+          <rect x="122" y="92" width="116" height="170" rx="26" fill="#25120f" stroke="#51413d" stroke-width="4"/>
+          <rect x="138" y="118" width="84" height="122" rx="18" fill="#5a2b21"/>
+          <circle cx="160" cy="164" r="10" fill="#1b1b1b"/>
+          <circle cx="194" cy="194" r="10" fill="#1b1b1b"/>
+          <circle cx="180" cy="132" r="26" fill="#f4ece1"/>
+          <rect x="176" y="52" width="8" height="54" rx="4" fill="#f1d4a1"/>
+        ` + end;
+      }
+      return start + bowl + `
+        <path d="M106 222c43-38 126-34 154 8 15 24-7 46-52 52-58 8-126-18-125-44 1-5 5-11 23-16Z" fill="#e59d49"/>
+        <path d="M115 222c59 30 94 34 132 12" stroke="#ffe09a" stroke-width="8" stroke-linecap="round"/>
+        <rect x="248" y="112" width="48" height="70" rx="12" fill="#ff5252"/>
+        <path d="M258 112c6-14 12-19 18-25" stroke="#ffd680" stroke-width="5" stroke-linecap="round"/>
+        ${steam}
+      ` + end;
+    }
+
+    function resetDemo(){
+      state.prize = null;
+      state.promoCode = null;
+      state.quizIndex = 0;
+      state.answers = [];
+      state.scenario = null;
+      state.resultBase = null;
+      $('spinResult').classList.add('hidden');
+      $('spinResult').innerHTML = '';
+      $('quizStart').classList.remove('hidden');
+      $('quizBox').classList.add('hidden');
+      $('predictBox').classList.add('hidden');
+      $('progressBar').style.width = '0';
+      currentRotation = 0;
+      $('wheel').style.transform = 'rotate(0deg)';
+    }
+    function scrollToDemo(){
+      document.getElementById('demo').scrollIntoView({behavior:'smooth'});
+      initAudio();
+      playClick();
+    }
+
+    $('spinBtn').addEventListener('click', spinWheel);
+    $('soundToggle').addEventListener('click', ()=>{
+      initAudio();
+      state.soundOn = !state.soundOn;
+      updateSoundBtn();
+      if(state.soundOn) playClick();
+    });
+    updateSoundBtn();
+  </script>
+</body>
+</html>
+'''
+
+path = Path('/mnt/data/chiho_balanced_full_site.html')
+path.write_text(html, encoding='utf-8')
+print(str(path))
